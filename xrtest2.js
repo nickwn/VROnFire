@@ -19,7 +19,8 @@ let inlineViewerHelper = null;
 
 let video = document.createElement('video');
 video.loop = true;
-video.src = 'media/PRICE_ForDataOverlay_360_injected.mp4';
+video.src = 'https://media.githubusercontent.com/media/nickwn/VROnFire/gh-pages/media/PRICE_ForDataOverlay_360_injected.mp4';
+video.crossOrigin = 'anonymous';
 video.play();
 
 // WebGL scene globals.
