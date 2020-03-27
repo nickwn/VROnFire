@@ -1,0 +1,48 @@
+"Room Length, in",150,,red = measured data,,,,,,,,
+"Room Width, in",120,,blue = adjustment factor,,,,,,,,
+"Room Height, in",150,,green = manual tweak,,,,,,,,
+,,,,,,,,,,,
+,"Distance from room origin*, in",,,,*Origin in SW corner,,,,,,
+Sensor name,X,Y,Z,,,,,,,,
+Camera,95,72,24,,,,,,,,
+TC1_S1,117,60,138,,,,,,,,
+TC2_S2,33,60,138,,,,,,,,
+TC3_C1,75,60,138,,,,,,,,
+TC4_PT1,18,30,27,,,,,,,,
+TC5_PT2,13,74,24,,,,,,,,
+TC6_PT3,90,4,38,,,,,,,,
+TC7_M1R,150,60,24,,,,,,,,
+TC8_M2L,42,120,24,,,,,,,,
+HeatFlux,144,144,24,,,,,,,,
+,,,,,,,,,,,
+Skybox origin**,95,72,24,,** Sykbox used to project video into Unity space,,,,,,
+,,,,,,,,,,,
+,"Distance from skybox origin, in",,,,,,,,,,
+Sensor name,X_bar,Y_bar,Z_bar,r_xz,"theta, rad","Quadrant, rad",,,,,
+Camera,0,0,0,0,#DIV/0!,error,,,,,
+TC1_S1,-22,114,-12,25,0.50,3.14,,,,,
+TC2_S2,62,114,-12,63,-0.19,0.00,,,,,
+TC3_C1,20,114,-12,23,-0.54,0.00,,,,,
+TC4_PT1,77,3,-42,88,-0.50,0.00,,,,,
+TC5_PT2,82,0,2,82,0.02,0.00,,,,,
+TC6_PT3,5,14,-68,68,-1.50,0.00,,,,,
+TC7_M1R,-55,0,-12,56,0.21,3.14,,,,,
+TC8_M2L,53,0,48,72,0.74,0.00,,,,,
+HeatFlux,-49,0,72,87,-0.97,3.14,,,,,
+,,,,,,,,,,,
+"scaler, -",4,4,4,,,,,,,,
+"rotation, deg",0,0,35,,,,,,,,
+,,,,,Previous version (manual picking),,,,Final version (used in Unity build),,
+,"Distance from skybox origin, - ",,,,"Distance from skybox origin, -",,,,"Distance from skybox origin, -",,
+Sensor name,X_bar,Y_bar,Z_bar,,X_bar,Y_bar,Z_bar,,X_bar,Y_bar,Z_bar
+Camera,#DIV/0!,0,#DIV/0!,,0,0,0,,0,0,0
+TC1_S1,-45,456,-90,,-25,500,-120,,0,300,-90
+TC2_S2,231,456,103,,250,500,75,,185,300,103
+TC3_C1,93,456,7,,110,500,-20,,93,300,7
+TC4_PT1,349,12,39,,500,20,40,,345,20,30
+TC5_PT2,264,0,195,,500,20,350,,264,5,200
+TC6_PT3,172,56,-211,,340,150,-400,,155,45,-220
+TC7_M1R,-153,0,-166,,350,-20,-400,,-140,-3,-180
+TC8_M2L,64,0,279,,110,-20,500,,40,0,279
+HeatFlux,-326,0,123,,-475,-15,200,,-326,0,123
+HRR,-,-,-,,175,-20,-400,,-,-,-

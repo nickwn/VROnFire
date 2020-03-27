@@ -1,0 +1,4 @@
+Event Count,Time (s),System Time,NTP Epoch Time (s),Event Description
+1,0,9/26/18 10:06,1537970781,VR360 camera start recording
+2,359.9999642,9/26/18 10:12,1537971142,Ignition - about 10 to 15 second late
+3,1685.999832,9/26/18 10:34,1537972468,Fire Out

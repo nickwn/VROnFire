@@ -1,0 +1,16 @@
+Index,Channel Name/Description,Legend/ID,Group Name,Source Type,Range/Type,Definition,Offset,Slope,LowCal (Zero),HighCal (Span),Calibration TimeStamp,Cal Group,Range Low,Range High,Out of Range,Background,Delay,Scaled Units,SCALED Global Name;RAW Global Name,Notes,dip switches,Smooth Interval (s),Pdf Plot #,Significant Digits
+0,Ambient Temperature near DAQ PC,TC0_Amb,Ambient TC,DAQ TC K-Type (°C),Thermocouple,PXI1slot4/ai0,0,1,,,,None,0,2000,"Set to ""NaN""",24.45731095,0,°C,Ambient Temperature,K type Thermocouple 30 gauge,na,1,1,2
+1,Sprinkler Head Temp 1 north 1' from ceiling,TC1_S1,SprinklerTCs,DAQ TC K-Type (°C),Thermocouple,PXI1slot4/ai1,0,1,,,,None,0,2000,"Set to ""NaN""",24.9669039,0,°C,Sprinkler Head 1 N 11.5',K type Thermocouple 30 gauge,na,1,1,2
+2,Sprinkler Head Temp 2 south 1' from ceiling,TC2_S2,SprinklerTCs,DAQ TC K-Type (°C),Thermocouple,PXI1slot4/ai2,0,1,,,,None,0,2000,"Set to ""NaN""",24.96290244,0,°C,Sprinkler Head 2 S 11.5',K type Thermocouple 30 gauge,na,1,1,2
+3,Room Ceiling Temp,TC3_C1,Room TCs,DAQ TC K-Type (°C),Thermocouple,PXI1slot4/ai3,0,1,,,,None,0,2000,"Set to ""NaN""",24.79804842,0,°C,Room Ceiling Center 12.5',K type Thermocouple 30 gauge,na,1,1,2
+4,Target 1 Plate thermocouple 1 NW,TC4_P1,Targer PTCs,DAQ TC K-Type (°C),Thermocouple,PXI1slot4/ai4,0,1,,,,None,0,2000,"Set to ""NaN""",25.31317754,0,°C,Target PT1 near fuel SW 2',K type Thermocouple 30 gauge,na,1,1,2
+5,Target 2 Plate thermocouple 2 NE,TC5_P2,Targer PTCs,DAQ TC K-Type (°C),Thermocouple,PXI1slot4/ai5,0,1,,,,None,0,2000,"Set to ""NaN""",25.43762026,0,°C,Target PT2 near vent SE 2',K type Thermocouple 30 gauge,na,1,2,2
+6,Target 3 Plate thermocouple 3 SW,TC6_P3,Targer PTCs,DAQ TC K-Type (°C),Thermocouple,PXI1slot4/ai6,0,1,,,,None,0,2000,"Set to ""NaN""",24.93464371,0,°C,Target PT3 near SS Cab NW 3',K type Thermocouple 30 gauge,na,1,2,2
+7,North Wall Temperature near right Mic,TC7_M1R,Room TCs,DAQ TC K-Type (°C),Thermocouple,PXI1slot4/ai7,0,1,,,,None,0,2000,"Set to ""NaN""",25.45978588,0,°C,Mic 1 right north wall 2',K type Thermocouple 30 gauge,na,1,2,2
+8,South Wall Temperature near left Mic,TC8_M2L,Room TCs,DAQ TC K-Type (°C),Thermocouple,PXI1slot4/ai8,0,1,,,,None,0,2000,"Set to ""NaN""",25.08852468,0,°C,Mic 2 left east wall 2',K type Thermocouple 30 gauge,na,1,2,2
+9,HRR,HRR,HRR,Global Variable,N/A,129.6.73.58(HRR),0,1,,,,None,0,10000,Do Nothing,,0,kW,,"globdata(r,c+1)",na,na,,4
+10,Duct Mass Flow Rate,MFRe,HRR,Global Variable,N/A,129.6.73.58(MFRe),0,1,,,,None,0,150,Do Nothing,,0,kg/s,,"globdata(r,c+1)",na,na,,4
+11,CO hood,CO,HRR,Global Variable,N/A,129.6.73.58(CO),0,1,,,,None,0,1,Do Nothing,,0,Vol fr,,"globdata(r,c+1)",na,na,,6
+12,Heat Flux near doorway,HeatFlux,HRR,Global Variable,N/A,129.6.73.58(HeatFlux),0,1,,,,None,0,1,Do Nothing,,0,Vol fr,,"globdata(r,c+1)",na,na,,6
+13,HRR event marker,HRRevent,HRR,Global Variable,N/A,129.6.73.58(EventSignal),0,1,,,,None,0,10000,Do Nothing,,0,V ,,"globdata(r,c+1)",na,na,,4
+14,Physical Button Event Controller,ButtonEvent,Event,Excel Function,N/A,"ButtonEvent=IF(HRRevent[i]<1.95,""Event:Fire Out"",(IF(HRRevent[i]>2.02,""Event:Ignition"",0.5)))",,,,,,None,0,2,Do Nothing,0.5,0,none,,"globdata(r,c+1)",na,na,,2

@@ -740,7 +740,7 @@ export class Renderer {
           }
 
           gl.uniformMatrix4fv(program.uniform.MODEL_MATRIX, false, instance.worldMatrix);
-
+          gl.disable(gl.CULL_FACE);
           if (primitive._indexBuffer) {
             gl.drawElements(primitive._mode, primitive._elementCount,
                 primitive._indexType, primitive._indexByteOffset);

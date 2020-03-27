@@ -6,6 +6,7 @@ import {SkyboxNode} from './js/render/nodes/skybox.js';
 import {InlineViewerHelper} from './js/util/inline-viewer-helper.js';
 import {QueryArgs} from './js/util/query-args.js';
 import {SevenSegmentText} from './js/render/nodes/seven-segment-text.js';
+import {mat4} from './js/third-party/gl-matrix/src/gl-matrix.js';
 
 // If requested, use the polyfill to provide support for mobile devices
 // and devices which only support WebVR.
@@ -21,7 +22,13 @@ let video = document.createElement('video');
 video.loop = true;
 video.src = 'https://media.githubusercontent.com/media/nickwn/VROnFire/gh-pages/media/PRICE_ForDataOverlay_360_injected.mp4';
 video.crossOrigin = 'anonymous';
-video.play();
+let videoEpochTime = 0;
+let sensorData = {};
+let isVideoPlaying = false;
+let sensorDataTexts = {};
+let hasIgnitionStarted = false;
+let hasFireFinished = false;
+//video.play();
 
 // WebGL scene globals.
 let gl = null;
@@ -33,14 +40,150 @@ scene.addNode(new SkyboxNode({
     videoElem: video
 }));
 
-let text1 = new SevenSegmentText();
-text1.matrix = new Float32Array([
-    0.075, 0, 0, 0,
-    0, 0.075, 0, 0,
-    0, 0, 1, 0,
-    0, -0.3, -0.5, 1,
-]);
-scene.addNode(text1);
+//let text1 = new SevenSegmentText();
+//text1.matrix = new Float32Array([
+//    0.075, 0, 0, 0,
+//    0, 0.075, 0, 0,
+//    0, 0, 1, 0,
+//    0, -0.3, -0.5, 1,
+//]);
+//scene.addNode(text1);
+
+function makeRequest(method, url) {
+    return new Promise(function (resolve, reject) {
+        let xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        xhr.onload = function () {
+            if (this.status >= 200 && this.status < 300) {
+                resolve(xhr.response);
+            } else {
+                reject({
+                    status: this.status,
+                    statusText: xhr.statusText
+                });
+            }
+        };
+        xhr.onerror = function () {
+            reject({
+                status: this.status,
+                statusText: xhr.statusText
+            });
+        };
+        xhr.send();
+    });
+}
+
+function parseCSV(text) {
+    const lines = text.split('\n');
+
+    const labelLine = lines.slice(0, 1)[0];
+    const labels = labelLine.split(',');
+
+    const dataLines = lines.slice(1);
+    let data = {};
+    for(let i = 0; i < dataLines.length; i++) {
+        const dataLine = dataLines[i];
+        const vals = dataLine.split(',');
+        for(let j = 0; j < vals.length; j++) {
+            if(!(labels[j] in data)) {
+                data[labels[j]] = [];
+            }
+            data[labels[j]].push(vals[j]);
+        }
+    }
+
+    return data;
+}
+
+function kindaFindKey(key, dict) {
+    for(const dictKey in dict) {
+        if(dictKey.includes(key)) {
+            return dictKey;
+        }
+    }
+    return '';
+}
+
+async function parseDataSet(path) {
+    const channelsText = await makeRequest('GET', path + 'RoomFire_Channels.csv');
+    const channels = parseCSV(channelsText);
+    const dataText = await makeRequest('GET', path + 'RoomFire_ScaledData.csv');
+    sensorData = parseCSV(dataText);
+
+    const channelsToTrack = ['TC0_Amb', 'TC1_S1', 'TC2_S2', 'TC3', 'TC4', 'TC5_P2', 'TC6_P3', 
+        'TC7_M1R', 'TC8_M2R', 'Heat Release Rate'];
+
+    const channelValDrawLocs = {
+        //'TC0_Amb': [0.0, 1.0, -1.0],
+        'TC1_S1': [-0.05, 1.5, -0.1],
+        'TC2_S2': [0.3, 1.5, 0.5],
+        'TC3': [0.2, 1.5, 0.2],
+        'TC4': [0.1, 0.1, 1.0],
+        'TC5_P2': [0.7, 0.05, 1.0],
+        'TC6_P3': [-1.0, 0.3, 0.7],
+        'TC7_M1R': [-1.0, 0.0, -1.0],
+        'TC8_M2L': [1.0, 0.0, 0.0]
+    }
+
+    const textScale = [0.025, 0.025];
+    const origin = new Float32Array([0.0, 0.0, 0.0]);
+    const up = new Float32Array([0.0, 1.0, 0.0]);
+    for(const channelName in channelValDrawLocs) {
+        const channelTextTransf = channelValDrawLocs[channelName];
+
+        const translation = new Float32Array(channelTextTransf);
+        let textMat = mat4.create();
+        mat4.targetTo(textMat, origin, translation, up);
+        mat4.scale(textMat, textMat, new Float32Array([textScale[0], textScale[1], 1.0]));
+        textMat[12] = translation[0];
+        textMat[13] = translation[1];
+        textMat[14] = translation[2];
+        //mat4.translate(textMat, textMat, translation);
+        console.log(textMat);
+        sensorDataTexts[channelName] = new SevenSegmentText();
+        sensorDataTexts[channelName].matrix = textMat;
+        scene.addNode(sensorDataTexts[channelName]);
+    }
+
+    const updateInterval = 500;
+    const epochTimes = sensorData['NTP Epoch Time (s)'];
+    for(const channelName in channelValDrawLocs) {
+        const kindaKey = kindaFindKey(channelName, sensorData);
+        const channelData = sensorData[kindaKey];
+        setInterval(() => {
+            if(isVideoPlaying) {
+                let highIdxBound = 0;
+                while(highIdxBound < epochTimes.length && epochTimes[highIdxBound] < videoEpochTime) {
+                    highIdxBound++;
+                }
+
+                if(highIdxBound == 0) {
+                    return; // early out
+                }
+
+                const lowIdxBound = highIdxBound - 1;
+                const interpAlpha = (videoEpochTime - epochTimes[lowIdxBound]) / 
+                    (epochTimes[highIdxBound] - epochTimes[lowIdxBound]);
+                const interpChannelVal = parseFloat(channelData[lowIdxBound]) + 
+                    interpAlpha * (parseFloat(channelData[highIdxBound]) - parseFloat(channelData[lowIdxBound]));
+
+                sensorDataTexts[channelName].text = interpChannelVal.toFixed(2);
+                //console.log(channelName + ': ' + interpChannelVal)
+            }
+        }, updateInterval);
+    }
+
+    console.log(sensorData);
+    //return data;
+}
+
+function onPlay() {
+    videoEpochTime = 1537970781; // when camera starts recording (in RoomFire_UserEvents.csv)
+    video.play();
+    isVideoPlaying = true;
+    hasIgnitionStarted = false;
+    hasFireFinished = false;
+}
 
 function initXR() {
     xrButton = new WebXRButton({
@@ -48,6 +191,7 @@ function initXR() {
         onEndSession: onEndSession
     });
     document.querySelector('header').appendChild(xrButton.domElement);
+    document.querySelector('#play').addEventListener('click', onPlay);
 
     if (navigator.xr) {
         navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
@@ -56,6 +200,13 @@ function initXR() {
 
         navigator.xr.requestSession('inline').then(onSessionStarted);
     }
+
+    parseDataSet('data/');
+    setInterval(()=>{
+        if(isVideoPlaying) {
+            videoEpochTime = 1537970781 + video.currentTime;
+        }
+    }, 10);
 }
 
 function initGL() {
@@ -111,9 +262,6 @@ function onSessionStarted(session) {
         }
         session.requestAnimationFrame(onXRFrame);
     });
-
-    
-    text1.text = '100';
 }
 
 function onEndSession(session) {
@@ -160,6 +308,16 @@ function onXRFrame(t, frame) {
     }
 
     scene.endFrame();
+
+    if (!hasIgnitionStarted && videoEpochTime > 1537971142) {
+        console.log('ignition started');
+        hasIgnitionStarted = true;
+    }// ignition start
+    if (!hasFireFinished && videoEpochTime > 1537971142) {
+        console.log('fire finished');
+        hasFireFinished = true;
+    }// ignition start
+
 }
 
 // Start the XR application.
