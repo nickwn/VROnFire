@@ -39,7 +39,7 @@ canvas {
   pointer-events: none;
 }
 
-#play {
+.materialish-btn {
   font-variant: small-caps;
   font-weight: 200;
   color: rgba(80,168,252,0.7);

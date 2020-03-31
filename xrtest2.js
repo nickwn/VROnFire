@@ -192,6 +192,16 @@ function initXR() {
     });
     document.querySelector('header').appendChild(xrButton.domElement);
     document.querySelector('#play').addEventListener('click', onPlay);
+    document.querySelector('#fwd').addEventListener('click', () => {
+        if(isVideoPlaying && video.currentTime + 10.0 < video.duration) {
+            video.currentTime = video.currentTime + 10.0;
+        }
+    });
+    document.querySelector('#back').addEventListener('click', () => {
+        if(isVideoPlaying && video.currentTime - 10.0 > 0.0) {
+            video.currentTime = video.currentTime - 10.0;
+        }
+    });
 
     if (navigator.xr) {
         navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
